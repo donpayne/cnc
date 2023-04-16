@@ -20,7 +20,7 @@ G43 H01 Z1.0 (Tool Length Compensation);
 M03 S1500 (Spindle Forward Command);
 M08 (Collant On);
 G00 Z.1; 
-G01 Z-.008 F10.;
+G01 Z0 F10.;
 ;
 M98 P1002 L3 (Run subroutine 3 times);
 ;
