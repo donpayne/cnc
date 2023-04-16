@@ -29,11 +29,9 @@ G53 G49 Z0 M05 (Z Home, Spindle Off);
 G53 Y0 (Y Home);
 M30 (End Program);
 %
-;
-(Cut Something Bitch!);
-;
+%
 (subroutine);
-O1002 (XY Plane Tool Path);
+O1002 (Cut Something Bitch!);
 G91 G01 Z-.008 (Incremental Depth for Each Pass)
 G90 (Back to Absolute Position);
 G00 X-.25 Y.125;
@@ -70,3 +68,4 @@ G01 X-.125 Y-.25;
 G02 X.25 Y.125 I.375 J0;
 G00 X-.25 Y.125;
 M99 (Return To M98);
+%
