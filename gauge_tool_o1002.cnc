@@ -1,5 +1,4 @@
 %
-(subroutine);
 O1002 (Cut Something Bitch!);
 G91 G01 Z-.08 (Incremental Depth for Each Pass)
 G90 (Back to Absolute Position);

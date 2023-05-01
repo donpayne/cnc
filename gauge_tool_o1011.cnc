@@ -1,5 +1,5 @@
 %
-O1001 (Gauge Project);
+O1011 (Gauge Project);
 (Don Payne);
 (4/14/2023);
 (Haas Mini Mill);
@@ -19,12 +19,12 @@ G54 G00 X-.5 Y.125 (Coordinate System);
 G43 H03 Z1.0 (Tool Length Compensation);
 M03 S4000 (Spindle Forward Command);
 M08 (Collant On);
-G01 Z0.0 F18.;
+G01 Z0 F18.;
 ;
-M98 P1002 L4 (Run subroutine 4 times);
+M98 P1012 L4 (Run subroutine 4 times);
 ;
 G00 Z.1 M09 (Rapid Retract, Collant Off);
-G53 G49 Z0.0 M05 (Z Home, Spindle Off);
-G53 Y0.0 (Y Home);
+G53 G49 Z0 M05 (Z Home, Spindle Off);
+G53 Y0 (Y Home);
 M30 (End Program);
 %

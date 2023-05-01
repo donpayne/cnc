@@ -1,6 +1,17 @@
 %
-O2001;
-G20 G90 G17 G94 G49 G40 G80;
+O2001 (Advanced Arcs);
+(Don Payne);
+(4/28/2023);
+(Haas Mini Mill);
+(G54 X0 Y0 Top Left Corner of Part);
+(Z0 Top of Part);
+G20 (Inches);
+G90 (Absolute Position);
+G17 (XY Plane Selection);
+G94 (Feet Per Minute);
+G49 (Cancel G43/G44/G143);
+G40 (Cancel Cutter Compensation);
+G80 (Cancel Canned Cycle);
 M06 T03;
 M01;
 G54 G00 X-.5 Y.125;
