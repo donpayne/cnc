@@ -6,6 +6,7 @@ Bodies created:
   Knight Stock  turned wax blank
 """
 import importlib
+import math
 import os
 import sys
 
@@ -22,13 +23,11 @@ _CM_PER_MM = 0.1
 TOOL_RADIUS_MM = 3.175 / 2
 SHOULDER_CLEARANCE_MM = 0.3  # Nothing needs the shoulder's top cut true, so keep the tool from rubbing it.
 BOUNDARY_MARGIN_MM = 2.6  # Lets the tool center run just past the stock, so its full width clears the wax.
-# The neck gets sawn off, so finishing passes stop just under the base rather than running down it.
-FINISH_BELOW_BASE_MM = 0.5
 # Rest machining misses these areas near the part axis: (X low, X high, Y low, Y high). Sides 90 and 270
-# stop 4.76 mm from the axis, so only sides 0 and 180 can finish them, and the finish center pass does.
-TOP_PATCH_MM = (-7.0, 7.0, 54.0, geo.STOCK_TOP_Y_MM + BOUNDARY_MARGIN_MM)
-SNOUT_PATCH_MM = (-6.5, -1.5, 34.0, 39.0)
-EARS_LOW_Y_MM = 55.0  # The valley between the ears bottoms out at about Y 56.6.
+# stop 7.94 mm from the axis, so only sides 0 and 180 can finish them, and the finish center pass does.
+TOP_PATCH_MM = (-8.6, 8.6, 53.1, geo.STOCK_TOP_Y_MM + BOUNDARY_MARGIN_MM)
+SNOUT_PATCH_MM = (-8.0, -1.85, 28.5, 34.7)
+EARS_LOW_Y_MM = 54.3  # The valley between the ears bottoms out at about Y 56.3.
 
 
 def _cylinder(temp, bottom_y_mm, top_y_mm, radius_mm):
@@ -148,7 +147,7 @@ def add_boundary_sketches(root):
 def add_finish_boundary_sketches(root):
     """Rectangles for the finishes only: from just under the base up, and the patches rest machining misses."""
     half_width_mm = geo.HEAD_RADIUS_MM + BOUNDARY_MARGIN_MM
-    low_y_mm = geo.KNIGHT_BASE_Y_MM - FINISH_BELOW_BASE_MM
+    low_y_mm = geo.FINISH_LOW_Y_MM
     high_y_mm = geo.STOCK_TOP_Y_MM + BOUNDARY_MARGIN_MM
     xy_plane, yz_plane = root.xYConstructionPlane, root.yZConstructionPlane
     _add_boundary_sketch("Finish Boundary XY", xy_plane, _on_xy, half_width_mm, low_y_mm, high_y_mm)
@@ -175,3 +174,18 @@ def add_tool_axis_sketch(root):
     origin = adsk.core.Point3D.create(0, 0, 0)
     for world_end in ((0, 0, 1), (1, 0, 0), (0, 0, -1), (-1, 0, 0)):
         lines.addByTwoPoints(sketch.modelToSketchSpace(origin), sketch.modelToSketchSpace(adsk.core.Point3D.create(*world_end)))
+    add_tilted_tool_axis_sketch(root)
+
+
+def add_tilted_tool_axis_sketch(root):
+    """The same four directions, tilted up by the finish angle, in the same order as Tool Axes."""
+    sketch = root.sketches.add(root.xZConstructionPlane)
+    sketch.name = "Tilted Tool Axes"
+    lines = sketch.sketchCurves.sketchLines
+    origin = adsk.core.Point3D.create(0, 0, 0)
+    tilt_rad = math.radians(geo.FINISH_TILT_DEG)
+    for azimuth_deg in (0, 90, 180, 270):
+        azimuth_rad = math.radians(azimuth_deg)
+        world_end = adsk.core.Point3D.create(
+            math.sin(azimuth_rad) * math.cos(tilt_rad), math.sin(tilt_rad), math.cos(azimuth_rad) * math.cos(tilt_rad))
+        lines.addByTwoPoints(sketch.modelToSketchSpace(origin), sketch.modelToSketchSpace(world_end))

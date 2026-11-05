@@ -258,8 +258,10 @@ def check(path):
                 if surface is not None:
                     rise = ball_rise((cx + i) * CELL_MM - end[0], (cy + j) * CELL_MM - end[1])
                     knight_gap = min(knight_gap, end[2] + rise - surface)
-            if math.hypot(tip[0], tip[2]) < geo.HEAD_RADIUS_MM + TOOL_RADIUS_MM:
-                lowest_y = min(lowest_y, tip[1] - TOOL_RADIUS_MM)
+            # On a tilted tool the ball's center isn't level with its tip, so measure from the center.
+            ball_center = tuple(tip[i] + axis[i] * TOOL_RADIUS_MM for i in range(3))
+            if math.hypot(ball_center[0], ball_center[2]) < geo.HEAD_RADIUS_MM:
+                lowest_y = min(lowest_y, ball_center[1] - TOOL_RADIUS_MM)
             gap, label = hardware_gap(tip, axis)
             if gap < hardware:
                 hardware, hardware_name = gap, label

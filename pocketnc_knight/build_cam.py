@@ -5,6 +5,7 @@ Run inside Fusion after build_model.py (see README).
 """
 import importlib
 import json
+import math
 import os
 import sys
 
@@ -44,7 +45,7 @@ ROUGH_RAPID_STOP_ABOVE_LEVEL_MM = 6.0  # 3 mm above the previous level's floor.
 # Rapids returning to a level stop this lead's radius plus 0.3 mm above it, so with Fusion's default
 # 0.32 mm they can hit the ridges a ball leaves, which stand up to one tool radius tall.
 ROUGH_ENTRY_LEAD_RADIUS_MM = 1.7
-ROUGH_MAX_STAY_DOWN_MM = 60.0  # Longer than the part, so more links stay down than retract and drop back in.
+ROUGH_MAX_STAY_DOWN_MM = 80.0  # Longer than the part, so more links stay down than retract and drop back in.
 FINISH_RAPID_STOP_ABOVE_MODEL_MM = 5.0
 ROUGH_LOAD_MM = 2.1  # Penta: 70% of tool diameter.
 # A ball's center doesn't cut, and Fusion's default 0.79 mm helix for a ball is close to a straight
@@ -75,7 +76,7 @@ TOOL_STICKOUT_MM = 25.4  # Penta's first-part tutorial uses 1 in with the extend
 TOOL_FLUTE_LENGTH_MM = 9.525  # Assumed: measure the real tool.
 EARS_SIDE_DEG = 90  # The valley between the ears runs along X. Sides 0 and 180 can't reach past the ears.
 # Past the axis by a radius, so the ball's full width clears the valley's end at X 0. By then side 90's
-# main pass has cleared the wax beyond X 4.76, which keeps the shank clear with 9.5 mm flutes.
+# main pass has cleared the wax beyond X 7.94, which keeps the shank clear with 9.5 mm flutes.
 EARS_FLOOR_ABOVE_AXIS_MM = -TOOL_DIAMETER_MM / 2
 
 # Extended holder envelope, estimated from Penta's "about 3 in long". Dimensions are
@@ -159,10 +160,13 @@ def _apply_recipe(params):
     _set(params, "clearanceHeight_offset", f"{CLEARANCE_ABOVE_RETRACT_MM} mm")
 
 
-def _avoid_uncut_stock(params):
-    """Keep the shank and holder off wax that hasn't been cut yet; Fusion's default is off."""
+def _avoid_uncut_stock(params, avoidance_mode="'non trimmed'"):
+    """Keep the shank and holder off wax that hasn't been cut yet; Fusion's default is off.
+
+    Scallop doesn't offer Adaptive's 'non trimmed' mode, so it passes 'trimmed'.
+    """
     _set(params, "useShaftAndHolder", "true")
-    _set(params, "shaftAndHolderMode", "'non trimmed'")
+    _set(params, "shaftAndHolderMode", avoidance_mode)
     _set(params, "useShaft", "true")
     _set(params, "useHolder", "true")
     _set(params, "shaftClearance", f"{SHANK_CLEARANCE_MM} mm")
@@ -173,12 +177,15 @@ def _sketch_line(root, sketch_name, index):
     return root.sketches.itemByName(sketch_name).sketchCurves.sketchLines.item(index)
 
 
-def _aim_tool(params, root, azimuth_deg):
-    """Aim the tool along one side direction. The Tool Axes lines run in azimuth order, 90 deg apart."""
+def _aim_tool(params, root, azimuth_deg, axes_sketch_name="Tool Axes"):
+    """Aim the tool along one side direction. Each axes sketch's lines run in azimuth order, 90 deg apart.
+
+    The tool's X axis stays on a level Tool Axes line, which is square to the tilted lines too.
+    """
     line_index = azimuth_deg // 90
     _set(params, "overrideToolView", "true")
     _set(params, "view_orientation_mode", "'axesZX'")
-    _select(params, "view_orientation_axisZ", [_sketch_line(root, "Tool Axes", line_index)])
+    _select(params, "view_orientation_axisZ", [_sketch_line(root, axes_sketch_name, line_index)])
     _select(params, "view_orientation_axisX", [_sketch_line(root, "Tool Axes", (line_index + 1) % 4)])
 
 
@@ -219,6 +226,16 @@ def _limit_depth(params, root, floor_above_axis_mm):
     _set(params, "bottomHeight_mode", "'from point'")
     _select(params, "bottomHeight_ref", [root.sketches.itemByName("Work Origin (G54)").sketchPoints.item(1)])
     _set(params, "bottomHeight_offset", f"{floor_above_axis_mm} mm")
+
+
+def _tilted_floor_mm(floor_above_axis_mm):
+    """Floor offset from the stock-top G54 point, along the tilted tool, passing the axis at the finish's low end.
+
+    A floor square to a tilted tool slopes through the part, and the G54 point is far up it. Measured
+    at the stock top, a level-tool floor would cut off everything below the Knight's top.
+    """
+    tilt_rad = math.radians(geo.FINISH_TILT_DEG)
+    return (geo.FINISH_LOW_Y_MM - geo.STOCK_TOP_Y_MM) * math.sin(tilt_rad) + floor_above_axis_mm * math.cos(tilt_rad)
 
 
 def _use_rest_material(params, ignore_thinner_than_mm):
@@ -293,7 +310,11 @@ def _scallop_input(setup, tool, root, azimuth_deg, display_name, boundary_sketch
 
 def add_finish(setup, tool, root, azimuth_deg, use_rest_material):
     op_input = _scallop_input(setup, tool, root, azimuth_deg, f"Finish side {azimuth_deg}",
-                              _side_boundary_name("Finish Boundary", azimuth_deg), _floor_above_part_axis_mm(azimuth_deg))
+                              _side_boundary_name("Finish Boundary", azimuth_deg),
+                              _tilted_floor_mm(_floor_above_part_axis_mm(azimuth_deg)))
+    _aim_tool(op_input.parameters, root, azimuth_deg, "Tilted Tool Axes")
+    # The sloped floor reaches past the level passes' depth, so the shank needs its own protection.
+    _avoid_uncut_stock(op_input.parameters, "'trimmed'")
     if use_rest_material:
         _use_rest_material(op_input.parameters, FINISH_IGNORE_REST_THINNER_THAN_MM)
     return setup.operations.add(op_input)
