@@ -315,6 +315,7 @@ def add_finish(setup, tool, root, azimuth_deg, use_rest_material):
     _aim_tool(op_input.parameters, root, azimuth_deg, "Tilted Tool Axes")
     # The sloped floor reaches past the level passes' depth, so the shank needs its own protection.
     _avoid_uncut_stock(op_input.parameters, "'trimmed'")
+    _set(op_input.parameters, "boundaryOverlap", "0 mm")  # Fusion warns on any overlap with shank avoidance on.
     if use_rest_material:
         _use_rest_material(op_input.parameters, FINISH_IGNORE_REST_THINNER_THAN_MM)
     return setup.operations.add(op_input)

@@ -102,9 +102,7 @@ Results for the current `nc/knight.ngc`:
 | Wax left outside the Knight | 137 mm3 in all, 2.5 mm3 of it above Y 55 |
 | Plunges with the ball's center | 27 moves, 0.16 mm at most, against the 0.2 mm limit |
 
-`check_gcode.py` lists two problems, which aren't real gouges: 0.064 mm and 0.067 mm into the Knight on Finish sides 90 and 0. Its 0.2 mm map cells overstate these. An exact sphere-to-mesh test on this program found the roughs at least 0.09 mm clear of the Knight, and the finishes no more than 0.033 mm into the mesh, which is about the size of its facets.
-
-Fusion warns on the four tilted finishes that "Boundary Overlap is not allowed to use with shaft/holder". It ignores the overlap setting, and the toolpaths are valid.
+`check_gcode.py` lists two problems, which aren't real gouges: 0.059 mm and 0.067 mm into the Knight on Finish sides 90 and 0. Its 0.2 mm map cells overstate these. An exact sphere-to-mesh test on this program found the roughs at least 0.09 mm clear of the Knight, and the finishes no more than 0.033 mm into the mesh, which is about the size of its facets.
 
 The replay doesn't catch everything: it found no rapids in the program where Simulate with Machine flagged one, so treat Simulate as the authority on collisions.
 
