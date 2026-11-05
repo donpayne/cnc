@@ -128,7 +128,7 @@ The replay doesn't catch everything: it found no rapids in the program where Sim
 
 ## Rebuilding
 
-You don't need Fusion to cut `nc/knight.ngc`. To rebuild the toolpaths in your own account, for example after changing `KNIGHT_SCALE`:
+You don't need Fusion to cut `nc/knight.ngc`. The saved Fusion document it came from is `Knight 80pct Pocket NC V2-10`, in the author's Default Project. The scripts don't read it: they rebuild from this folder. To rebuild the toolpaths in your own account, for example after changing `KNIGHT_SCALE`:
 
 1. Check your licence. Every operation uses a tilted tool orientation (3+2). Autodesk's 2020 terms kept that out of the free personal tier, so check its current terms.
 2. Run the setup script from the [repo's README](../README.md#setup). Run it again after any change to the files it installs.
