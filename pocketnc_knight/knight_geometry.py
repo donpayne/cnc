@@ -11,20 +11,24 @@ SOURCE_BASE_Z_MM = -82.7664  # Bottom of the Knight in knight_source.sat.
 KNIGHT_HEIGHT_MM = SOURCE_HEIGHT_MM * KNIGHT_SCALE
 KNIGHT_BASE_RADIUS_MM = 21.6027 * KNIGHT_SCALE
 
-# From Penta's "B-table and Collet v1.step".
-COLLET_NUT_HEIGHT_MM = 18.52
-COLLET_NUT_RADIUS_MM = 20.45
+# From Penta's "B-table and Collet v1.step", with its assembly transforms applied. The parts' own
+# coordinates don't include those: read alone, they gave 20.45 (the collet's rim) and 18.52 here.
+NUT_TOP_ABOVE_TABLE_MM = 3.62
+COLLET_NUT_RADIUS_MM = 25.925
 TABLE_RADIUS_MM = 44.97
 TABLE_TOP_Y_MM = -21.23  # Penta: machine origin is 0.836 in above the B table.
-NUT_TOP_Y_MM = TABLE_TOP_Y_MM + COLLET_NUT_HEIGHT_MM
+NUT_TOP_Y_MM = TABLE_TOP_Y_MM + NUT_TOP_ABOVE_TABLE_MM
 
 STUMP_RADIUS_MM = 12.7  # Matches a 1 in ER40 collet.
-# Engages about 32 mm of the 46 mm collet, meeting the two-thirds rule for full grip.
-STUMP_LENGTH_MM = 42.0
+# Grips 30 mm of the 44.5 mm collet, meeting the two-thirds rule. The collet's top is 0.11 mm below
+# the nut's, so 17 mm of the stump stands out above the collet.
+STUMP_LENGTH_MM = 47.0
 # 1.125 in. Clears the 14.04 mm Knight base by 0.25 mm, which is enough only because the head and
 # stump are turned in one lathe setup. 1.25 in meant 39% more wax to rough out.
 HEAD_RADIUS_MM = 14.2875
-SHOULDER_ABOVE_NUT_MM = 2.0
+# Puts the shoulder where nc/knight.ngc was programmed. A shoulder 2 mm above the nut would bring the
+# holder level with the B table's top on the lowest passes, leaving no clearance.
+SHOULDER_ABOVE_NUT_MM = 16.9
 SHOULDER_BOTTOM_Y_MM = NUT_TOP_Y_MM + SHOULDER_ABOVE_NUT_MM
 SHOULDER_THICKNESS_MM = 2.0  # The wax disc left above the stump after cutting.
 # Undercuts the 14 mm base by only 3 mm. A 6 mm neck made the tool reach 9.9 mm in from the shoulder's

@@ -26,10 +26,12 @@ G-code and Fusion scripts for cutting a 65% scale chess Knight from round wax, h
 | Feature | Size                                                                |
 | ------- | ------------------------------------------------------------------- |
 | Head    | 28.6 mm (1.125 in) diameter x 61.3 mm long, with the top faced flat |
-| Stump   | 25.4 mm (1 in) diameter x 42 mm long                                |
-| Overall | 103.3 mm                                                            |
+| Stump   | 25.4 mm (1 in) diameter x 47 mm long                                |
+| Overall | 108.3 mm                                                            |
 
 The head clears the Knight's base by only 0.25 mm per side, so turn the head and stump in one setup to keep them concentric.
+
+**The stump stands 17 mm proud of the nut.** The holder passes below the shoulder on the lowest passes, so the part has to sit this high to clear the B table. The other 30 mm of the stump grips in the collet.
 
 **Cuts left in the wax.** A 22 mm neck sits between the base and a 2 mm shoulder. It undercuts the base by 3 mm. A narrower neck made the tool reach past its flutes, so the shank rubbed the shoulder.
 
@@ -51,7 +53,7 @@ The head clears the Knight's base by only 0.25 mm per side, so turn the head and
 
 ## Run order
 
-1. Install the ER40 fixture and put the stump in the collet with the head's shoulder **2 mm above the nut**, set with a shim. Tighten by hand, then with the spanner, and remove the shim. Stop if the drive gear slips: too much force damages the B-axis drive.
+1. Install the ER40 fixture and put the stump in the collet with the head's shoulder **16.9 mm above the nut**, set with calipers. Stay within 1 mm: higher uses up the 1.57 mm of Y travel the program leaves, and lower brings the holder closer to the table. Tighten by hand, then with the spanner, and re-measure. Stop if the drive gear slips: too much force damages the B-axis drive.
 2. Home the machine and activate T11.
 3. Touch off **Y only**, on top of the stock, and set G54 Y, allowing for the tool radius as in Penta's WCS tutorial. X and Z stay at the machine's own center, because the stock is on the B axis (same tutorial, Appendix A).
 4. Run `nc/knight.ngc`.
@@ -89,7 +91,7 @@ Results for the current `nc/knight.ngc`:
 |---|---|
 | Fusion Simulate with Machine | **Not yet run on this program** |
 | Y travel | Reaches 63.2 mm, against the 64.77 mm limit |
-| Holder to collet nut | 4.3 mm, against the 2.0 mm minimum |
+| Holder to collet nut and B table | 14.3 mm, against the 2.0 mm minimum |
 | Ball to shoulder | 0.29 mm |
 | Tool, holder and spindle to machine bodies | 14.68 mm |
 | Rapids, shank and holder into wax | None deeper than the replay's 0.15 mm limit |
@@ -102,6 +104,8 @@ The replay doesn't catch everything: it found no rapids in the program where Sim
 
 ## What has not been checked
 
+- **Fixture size.** The nut's 51.85 mm diameter and its top 3.62 mm above the B table come from Penta's simplified CAD model, not your fixture. Measure both before cutting. If they differ, update `COLLET_NUT_RADIUS_MM`, `NUT_TOP_ABOVE_TABLE_MM` and `SHOULDER_ABOVE_NUT_MM` in `knight_geometry.py` and run `check_gcode.py`.
+- **Exposed stump.** The 17 mm of 1 in wax above the collet hasn't been tried under cutting loads.
 - **Holder size and flute length.** The extended holder is an estimated envelope from Penta's "about 3 in long", and the flute length is assumed to be 3/8 in.
 - **Machine simulation.** The scripts can't start Simulate with Machine or Penta's simulator, and Penta's hasn't been run. The Fusion machine model also has no collet or nut, so only `check_gcode.py` tests those.
 - **B axis X position.** Fusion's machine file puts the B axis at machine X = 6.05 mm, while the run order keeps G54 X at the machine's center, following Penta's tutorial. Confirm in Penta's simulator that the tool lines up with the B axis.
