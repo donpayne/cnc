@@ -1,0 +1,14 @@
+# Machine programs and binary files stay byte for byte, so autocrlf can't change checked G-code.
+*.cnc     -text
+*.ngc     -text
+*.sat     -text
+*.cncprj  binary
+
+*.py      text eol=lf
+*.json    text eol=lf
+*.md      text eol=lf
+*.manifest text eol=lf
+# sh can't read a CRLF script.
+*.sh      text eol=lf
+*.ps1     text eol=crlf
+*.cmd     text eol=crlf

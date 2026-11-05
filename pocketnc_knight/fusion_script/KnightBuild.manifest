@@ -1,0 +1,10 @@
+{
+  "autodeskProduct": "Fusion",
+  "type": "script",
+  "author": "Don Payne",
+  "description": {
+    "": "Builds the 65% chess Knight for a Pocket NC V2-10 in a new document and posts its G-code."
+  },
+  "supportedOS": "windows|mac",
+  "editEnabled": true
+}
