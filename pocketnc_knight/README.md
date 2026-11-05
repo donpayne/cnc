@@ -109,7 +109,7 @@ The replay doesn't catch everything: it found no rapids in the program where Sim
 - **Holder size and flute length.** The extended holder is an estimated envelope from Penta's "about 3 in long", and the flute length is assumed to be 3/8 in.
 - **Machine simulation.** The scripts can't start Simulate with Machine or Penta's simulator, and Penta's hasn't been run. The Fusion machine model also has no collet or nut, so only `check_gcode.py` tests those.
 - **B axis X position.** Fusion's machine file puts the B axis at machine X = 6.05 mm, while the run order keeps G54 X at the machine's center, following Penta's tutorial. Confirm in Penta's simulator that the tool lines up with the B axis.
-- **Neck strength.** The 12 mm wax neck carries the whole Knight through finishing. It hasn't been tried.
+- **Neck strength.** The 22 mm wax neck carries the whole Knight through finishing. It hasn't been tried.
 
 ## Known issues
 
