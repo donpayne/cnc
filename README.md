@@ -2,8 +2,6 @@
 
 ## Setup
 
-The `.cnc` programs are plain text with no install step. `lathe_jaws_o4001.cncprj` is a CNCSimulator Pro project, so it needs that program, which it expects in its default Windows install folder.
-
 The [Pocket NC Knight](pocketnc_knight/README.md) has a Fusion script and Python checks. To install them, get [Python](https://www.python.org/downloads/) 3.9 or newer, open Fusion once if you plan to use it, then run this from the repo's folder.
 
 On macOS:
@@ -25,6 +23,3 @@ To test the setup code itself:
 ```bash
 python3 -B -m unittest test_setup_fusion
 ```
-
-## Gauge Tool
-Initial machine setup with 3 passes along the tool path.
