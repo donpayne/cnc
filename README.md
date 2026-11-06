@@ -4,6 +4,8 @@ The [Haas Knight checks](haas_knight/README.md) replay posted programs for chess
 
 The [Haas Rook](haas_rook/README.md) is the next piece on those machines, and uses the same checks.
 
+The [Haas Bishop](haas_bishop/README.md) follows, with its own slit and metric lathe checks.
+
 ## Setup
 
 The [Pocket NC Knight](pocketnc_knight/README.md) has a Fusion script and Python checks. To install them, get [Python](https://www.python.org/downloads/) 3.9 or newer, open Fusion once if you plan to use it, then run this from the repo's folder.
