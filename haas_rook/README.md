@@ -4,7 +4,7 @@ Fusion helpers, a replay check and posted programs for a 73% chess Rook in 1215 
 
 **Status: nothing here has cut metal.** Feeds and speeds are untested estimates, and holder sizes are estimates too. The toolpaths live in the Fusion document `Chess Rook 73pct Haas UMC-350HD-EDU`. `nc/` holds copies of what was posted from it, so the checks have something to run on.
 
-Version 1 of the document was reported clean in Simulate. That check used catalog vise dimensions and estimated holders, so measure both before running the program.
+Version 2 of the document was reported clean in Simulate. That check used catalog vise dimensions and estimated holders, so measure both before running the program.
 
 ## The part
 
