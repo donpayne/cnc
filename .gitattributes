@@ -1,6 +1,7 @@
 # Machine programs and binary files stay byte for byte, so autocrlf can't change checked G-code.
 *.cnc     -text
 *.ngc     -text
+*.nc      -text
 *.sat     -text
 *.cncprj  binary
 
