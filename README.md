@@ -1,5 +1,9 @@
 # CNC Programs
 
+The [Haas Knight checks](haas_knight/README.md) replay posted programs for chess pieces cut on a Haas ST-15 and UMC-350HD-EDU. They need Python with NumPy and SciPy, and none of the setup below.
+
+The [Haas Rook](haas_rook/README.md) is the next piece on those machines, and uses the same checks.
+
 ## Setup
 
 The [Pocket NC Knight](pocketnc_knight/README.md) has a Fusion script and Python checks. To install them, get [Python](https://www.python.org/downloads/) 3.9 or newer, open Fusion once if you plan to use it, then run this from the repo's folder.
