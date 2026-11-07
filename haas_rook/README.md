@@ -4,7 +4,7 @@ Fusion helpers, a replay check and posted programs for a 73% chess Rook in 1215 
 
 **Status: nothing here has cut metal.** Feeds and speeds are untested estimates, and holder sizes are estimates too. The toolpaths live in the Fusion document `Chess Rook 73pct Haas UMC-350HD-EDU`. `nc/` holds copies of what was posted from it, so the checks have something to run on.
 
-Version 2 of the document was reported clean in Simulate. That check used catalog vise dimensions and estimated holders, so measure both before running the program.
+Version 2 of the document was reported clean in Simulate. That check used catalog vise dimensions and estimated holders, so measure both before running the program. The per-side passes have since become circular patterns, which post the same moves, but Simulate hasn't been rerun on the patterned document.
 
 ## The part
 
@@ -25,10 +25,14 @@ Scaled from `Solid Of Castle` in the `Chess Set` document: 56.79 mm tall, 31.54 
 The order is top to bottom, and the head's outside comes before the pocket and notches, so no merlon wall is cut from outside after its inside is gone.
 
 1. `Semi Head`, `Flank Head`: one contour around the head at B0.
-2. `Trace Steps` x 8: B90, end-on to each side, with the top of the tool on each underside so the inside corners stay sharp.
+2. `Trace Steps x8`: B90, end-on to each side, with the top of the tool on each underside so the inside corners stay sharp.
 3. `Rough Pocket`, `Semi Pocket Walls`, `Finish Pocket Floor`, `Finish Pocket Walls`: B0.
 4. `Rough Notches`, `Finish Notch Walls`: B0.
-5. `Semi Shaft` x 8, `Flank Shaft` x 8: B90, with the tool along the side's ruling and a spring pass on the flank.
+5. `Semi Shaft x8`, `Flank Shaft x8`: B90, with the tool along the side's ruling and a spring pass on the flank.
+
+**The `x8` stages are circular CAM patterns,** as on the [Queen](../haas_queen/README.md). Each is one pass at side 000, repeated around the part's Z axis. Changing a side's settings now means editing one pass, not eight. The pattern's angle is the step between instances, 45 deg. Set to 360 deg it would put all 8 on C 0 and cut one side 8 times, with no warning from Fusion.
+
+Fusion's API can't create a pattern. So `Trace Steps x8` was made by hand in the `Add to New Pattern` dialog, and `replace_sides_with_patterns` in `rook_cam.py` copied it for the shaft stages. Posted with patterns, the program matched the version with 8 separate passes line for line, apart from 21 comments. Every instance is labelled with its side-000 name, such as `(Flank Shaft 000)`, so tell them apart by the C word that follows. On `Trace Steps` C is the side's angle. On the shaft passes it's the side's angle minus 90, because the tool runs along the side, so side 000 is C270.
 
 ## Tools
 
@@ -61,7 +65,7 @@ The check reads the program, not the machine. It doesn't replace Simulate with M
 
 | File | Purpose |
 |---|---|
-| `rook_cam.py` | Fusion helpers that built the milling passes, with the Rook's dimensions. |
+| `rook_cam.py` | Fusion helpers that built the milling passes and their patterns, with the Rook's dimensions. |
 | `rook_job.py` | What the checks need to know about the part, tools and machine. |
 | `check_faces.py` | Replay check for flat tools. |
 | `rook_faces.json` | The Rook's 114 faces as meshes. |

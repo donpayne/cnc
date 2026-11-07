@@ -46,6 +46,11 @@ def deepest_tool_reach(one_pass, frame, tree):
     return deepest
 
 
+def pass_label(one_pass):
+    """Pattern instances all post under the seed's name, such as Flank Shaft 000, so the C angle tells them apart."""
+    return f"{one_pass.name} C{one_pass.c_deg % 360:g}"
+
+
 def main():
     chosen = tuple(sys.argv[2:])
     points, owners = replay.surface_samples(SAMPLE_SPACING_MM)
@@ -66,7 +71,7 @@ def main():
         for face in face_ids:
             share = is_touch[owners == face].mean()
             if share >= MIN_FACE_SHARE:
-                touch_by_face[face][one_pass.name] = round(float(share) * 100)
+                touch_by_face[face][pass_label(one_pass)] = round(float(share) * 100)
         gouged_faces = sorted(set(owners[is_gouge].tolist()))
         lathe_touched = sorted(set(owners[(deepest > -TOUCH_MM) & ~milled].tolist()))
         worst = float(deepest.max()) if np.isfinite(deepest).any() else float("nan")

@@ -472,15 +472,18 @@ def add_notch_passes(cam, setup, root, origin_point):
     add_operation(cam, setup, "contour2d", "Finish Notch Walls", 12, finish, T12_FEEDS_FINISH)
 
 
-def add_shaft_passes(cam, setup, root, origin_point):
-    """Each side twice, with the tool along the side's ruling, running down from the top of the flank."""
+def add_shaft_passes(cam, setup, root, origin_point, side_angles_deg=(0,)):
+    """Side 000 twice, with the tool along the side's ruling, running down from the top of the flank.
+
+    The other sides come from circular patterns (see pattern_around_c). Pass SIDE_ANGLES_DEG to build all eight.
+    """
     up_line = up_axis_line(root)
     leads = {
         "doLeadIn": "true", "doLeadOut": "true", "entry_radius": "1 mm", "entry_distance": "0 mm",
         "exit_sameAsEntry": "false", "exit_radius": "0.25 mm", "exit_distance": "0 mm",
     }
     for prefix, settings in (("Semi Shaft", SEMI_CONTOUR), ("Flank Shaft", FINISH_CONTOUR)):
-        for angle in SIDE_ANGLES_DEG:
+        for angle in side_angles_deg:
             sketch = add_flank_sketch(root, angle)
             axis = add_axis_line(root, (angle - 90) % 360)
 
@@ -492,6 +495,66 @@ def add_shaft_passes(cam, setup, root, origin_point):
                 set_expressions(params, settings)
 
             add_operation(cam, setup, "contour2d", f"{prefix} {angle:03d}", 2, configure, T2_FEEDS)
+
+
+# The pattern's angle is the step between instances, not the total. At 360 deg every instance lands on C 0, which cuts
+# one side 8 times with no warning from Fusion.
+PATTERN_STEP_DEG = 45.0
+PATTERN_INSTANCES = 8
+# Each stage is one pass at side 000 in its own pattern. One pass per pattern keeps the pattern's tool ordering from
+# mixing stages.
+PATTERN_STAGES = ("Trace Steps", "Semi Shaft", "Flank Shaft")
+
+
+def check_seed_pattern(pattern):
+    """Fusion's API can't create a pattern, so the first is made by hand. Refuse one that would cut the wrong sides."""
+    params = pattern.parameters
+    pattern_type = params.itemByName("patternType").expression
+    step_deg = params.itemByName("angle").value.value
+    instances = int(params.itemByName("numberOfInstances").value.value)
+    is_right_pattern = pattern_type == "'circular'" and abs(step_deg - PATTERN_STEP_DEG) < 1e-6 and instances == PATTERN_INSTANCES
+    if not is_right_pattern:
+        raise ValueError(f"seed pattern is {pattern_type}, {step_deg} deg x {instances}; needs circular, 45 deg x 8")
+
+
+def _pattern_ids(setup):
+    return {setup.patterns.item(index).operationId for index in range(setup.patterns.count)}
+
+
+def _operation_named(setup, name):
+    return next(operation for operation in setup.allOperations if operation.name == name)
+
+
+def pattern_around_c(setup, seed_pattern, operation, stage):
+    """Moves a pass into a copy of the seed pattern and returns the copy, placed where the pass was."""
+    check_seed_pattern(seed_pattern)
+    known_ids = _pattern_ids(setup)
+    seed_pattern.duplicate()
+    new_pattern = next(
+        setup.patterns.item(index) for index in range(setup.patterns.count) if setup.patterns.item(index).operationId not in known_ids
+    )
+    copied_pass = new_pattern.operations.item(0)
+    new_pattern.moveBefore(operation)
+    operation.moveInto(new_pattern)
+    copied_pass.deleteMe()
+    new_pattern.name = f"{stage} x8"
+    return new_pattern
+
+
+def replace_sides_with_patterns(setup, seed_pattern):
+    """Puts each stage's side 000 pass in a pattern, and deletes any other per-side passes left from an 8-pass build.
+
+    To rebuild: build the side 000 passes, make the seed by hand on Trace Steps 000 (circular, Z axis, 45 deg x 8), then
+    run this.
+    """
+    check_seed_pattern(seed_pattern)
+    seed_pattern.name = f"{PATTERN_STAGES[0]} x8"
+    for stage in PATTERN_STAGES[1:]:
+        pattern_around_c(setup, seed_pattern, _operation_named(setup, f"{stage} 000"), stage)
+    other_side_names = {f"{stage} {angle:03d}" for stage in PATTERN_STAGES for angle in SIDE_ANGLES_DEG[1:]}
+    # Collected first, because deleting while walking allOperations would skip passes.
+    for operation in [operation for operation in setup.allOperations if operation.name in other_side_names]:
+        operation.deleteMe()
 
 
 def generate_next(cam, setup, batch_size):
