@@ -95,6 +95,8 @@ python3 -B -c "import sys; sys.path[:0] = ['haas_bishop', 'haas_knight']; import
 
 These read the program, not the machine. They don't replace Simulate with Machine, and they don't model the holders or the vise.
 
+Simulate with Machine ran clean on both setups on 2026-11-07, on the posted programs in `nc/`. Rerun it after any change.
+
 ## Files
 
 | File | Purpose |
