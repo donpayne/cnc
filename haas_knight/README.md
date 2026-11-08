@@ -15,7 +15,7 @@ Program 1001 runs about 5.6 min. The head is finished before the waist and neck 
 
 The head ends at z 13.23, where the profile below is nearly a cylinder, so `Finish head` has no lead-out and leaves straight out in X. T6 roughs 13 mm lower than that, because T7's holder is 20 mm wide, centred on its tip. The spun profile and the finishing passes are at 0.002 mm, not Fusion's 0.01, which ran the Pawn's finish 0.015 mm inside its neck.
 
-`check_lathe.py` on this post leaves at most 0.041 mm, in the small fillet at z 5.8 to 6.0 that T7's r 0.4 nose can't fill, and cuts in by at most 0.004 mm. No cutting move feeds faster than 0.15 mm/rev. T6, T7 and T8 are placeholder inserts, and part-off and the base's underside have no pass yet. Simulate hasn't run on this order, and it's the check that caught T7's holder hitting raw bar on the Pawn.
+`check_lathe.py` on this post leaves at most 0.041 mm, in the small fillet at z 5.8 to 6.0 that T7's r 0.4 nose can't fill, and cuts in by at most 0.004 mm. No cutting move feeds faster than 0.15 mm/rev. T6, T7 and T8 are placeholder inserts, and part-off and the base's underside have no pass yet. You reported Simulate good on this order (version 10). That's plain Simulate, since the ST-15's machine file has no 3D model, and it's the check that caught T7's holder hitting raw bar on the Pawn.
 
 ## Running the checks
 
