@@ -52,7 +52,7 @@ def _holder_from(height_mm):
 # The bands above each tool's cutter, from Fusion's tool library.
 SHANKS = {
     3: [Band(15.875, 30.0, 2.381)],
-    4: [Band(9.525, 25.0, 1.5875)],
+    4: [Band(9.525, 25.0, 1.5875), Band(25.0, 31.1, 3.175)],
     10: [Band(4.7625, 19.05, 0.794), Band(19.05, 25.4, 1.5875)],
     14: [Band(3.0, 10.0, 1.0), Band(10.0, 20.0, 1.5875)],
 }

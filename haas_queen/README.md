@@ -2,7 +2,7 @@
 
 Checks and posted programs for a 73% chess Queen in 1215 steel, turned on a Haas ST-15 and then milled on a Haas UMC-350HD-EDU. It's the same scale, vise and steel as the [Bishop](../haas_bishop/README.md), [Rook](../haas_rook/README.md) and [Knight](../haas_knight/README.md), but on larger bar, because its 35.96 mm base doesn't fit 1-1/4 in.
 
-**Status: nothing here has cut metal.** Simulate in Fusion was reported good on these programs, but it hasn't been confirmed that this was Simulate with Machine. Feeds and speeds are untested estimates, and tool and holder sizes are estimates too. The toolpaths live in the Fusion document `Chess Queen 73pct Haas UMC-350HD-EDU`, in the project of the same piece. `nc/` holds copies of what was posted from it, and the `queen_*_cam.py` scripts record how the passes were built.
+**Status: nothing here has cut metal.** Simulate with Machine flagged Z over-travel on the earlier B95 stem flutes, which are now split into a B83 band and a B90 end. The user reported the simulations good on this program. Feeds and speeds are untested estimates, and tool and holder sizes are estimates too. The toolpaths live in the Fusion document `Chess Queen 73pct Haas UMC-350HD-EDU`, in the project of the same piece. `nc/` holds copies of what was posted from it, and the `queen_*_cam.py` scripts record how the passes were built.
 
 ## The part
 
@@ -56,7 +56,7 @@ Stock left by the replay:
 
 ## Mill
 
-Program 2004, about 63 min. Jergens 130 mm vise, aluminum soft jaws, no riser, 30 mm grip on the stub. G54 is the finial's tip, model z 81.003, and the stock is the `Lathe Target` body. Passes run far from the vise first.
+Program 2004, about 66 min. Jergens 130 mm vise, aluminum soft jaws, no riser, 30 mm grip on the stub. G54 is the finial's tip, model z 81.003, and the stock is the `Lathe Target` body. Passes run far from the vise first.
 
 | Stage | Tool | Pose | Settings | Min, all passes |
 |---|---|---|---|---|
@@ -66,7 +66,8 @@ Program 2004, about 63 min. Jergens 130 mm vise, aluminum soft jaws, no riser, 3
 | `Detail Inner` x 8 | T10 | B60 | Scallop, stepover 0.08 | 4.7 |
 | `Detail Crest` x 8 | T10 | B60, C 22.5 and so on | Scallop, stepover 0.08 | 15.2 |
 | `Trace Crown Flute` x 8 | T14 | B90 | 3 rough, 5 finish cuts | 8.1 |
-| `Trace Stem Upper` x 8 | T14 | B95 | Same | 9.1 |
+| `Trace Stem Upper End` x 8 | T14 | B90 | End sphere and run-out only, 3 rough, 5 finish cuts | 2.9 |
+| `Trace Stem Upper` x 8 | T14 | B83 | Band only, 3 rough, 5 finish cuts | 9.0 |
 | `Trace Stem Lower` x 8 | T14 | B90 | Same | 7.0 |
 
 Every pass is at a fixed tilt, so the program needs no TCPC.
@@ -75,9 +76,11 @@ Every pass is at a fixed tilt, so the program needs no TCPC.
 
 **Repeats are circular CAM patterns.** Each `x 8` stage is one pass at C 0 (C 22.5 for the crest) in a pattern around the part's Z axis, so a full rebuild of the mill setup is 8 generations, about 15 s. The pattern's angle is the step between instances, 45 deg. Set to 360 deg it puts all 8 at C 0, which cuts one feature 8 times with no warning from Fusion. Fusion's API can't create a pattern, so the first is made by hand in the `Add to New Pattern` dialog, and `pattern_around_c` copies it for the rest.
 
-**`Trace Stem Upper` tilts to B95.** The floor is nearly parallel to the part's axis, so B90 would cut on the ball's tip, where surface speed is 0. B95 cuts 5 to 10 deg off the tip, at 5 m/min or more. B75 ran T14's neck 48 um into the top of the flute's run-out, and B105 drops the holder's flange 13.5 mm into the jaws at C 45, 135, 225 and 315.
+**The upper stem flutes are cut in two passes.** The band's floor is nearly parallel to the part's axis, so B90 would cut on the ball's tip, where surface speed is 0. B83 moves the contact about 7 deg off the tip on most of the band, about 8 m/min, and 2 deg on its lowest 2.5 mm. Leaning up like that runs T14's neck into the turned stem above the flute's end, 12 um at B83, 25 at B80 and 48 at B75, so the band stops at the bottom of the end sphere and `Trace Stem Upper End` cuts the end at B90 first. Its run-out is radial, like the lower band's end.
 
-C climbs across the program, to 2,835 deg on the last flute, because the post doesn't reset it between passes. It only sends C home at the very end, with `G28 G91 C0`. Confirm the control accepts that.
+**Tilting past B90 costs Z travel.** G54 is 200.6 mm from the B pivot along the part's axis. At B90 it sits at pivot height; past B90 it swings below, 17.5 mm at B95, which ran the spindle 11 mm past its lower limit. B105 also dropped the holder's flange into the jaws.
+
+C climbs across the program, to 3,195 deg on the last flute, because the post doesn't reset it between passes. It only sends C home at the very end, with `G28 G91 C0`. Confirm the control accepts that.
 
 ## Tools
 
@@ -86,7 +89,7 @@ Mill tools. Lengths in mm. Total is gauge line to tip.
 | Tool | Type | Total | rpm | mm/min |
 |---|---|---|---|---|
 | T3 | 3/16 in ball | 118.9 | 8,000 | 400 |
-| T4 | 1/8 in ball, 6.35 shank from 25 up | 113.9 | 10,000 | 305 |
+| T4 | 1/8 in ball, 6.35 shank from 25 up, 31.1 out of the holder | 120.0 | 10,000 | 305 |
 | T10 | 1/16 in ball, 2-flute, relieved neck to 19.05 | 114.3 | 10,000 | 120 |
 | T14 | 2 mm ball, relieved neck to 10, 3.175 shank | 108.9 | 10,000 | 150 |
 
@@ -96,12 +99,12 @@ T14 is new, so all of its numbers are estimates until a real tool is chosen. All
 
 On the posted programs:
 
-- **No gouges on any of the 64 mill passes, links included.** The deepest any tool came into the model is 16 um, on the flutes, where readings include the mesh's chord error.
+- **No gouges on any of the 72 mill passes, links included.** The deepest any tool came into the model is 16 um, on the flutes, where readings include the mesh's chord error.
 - **Every milled face is covered.** All non-revolved faces read at least 86% touched, with at most 17 um left on the samples that weren't. The rest are at those faces' edges.
 - **T5's and T8's grooves stay out of the target.** `Groove crown cone`, `Rough finial neck` and `Finish finial neck` read 0, and `Groove under flange` 0.003 mm. T5 gets to r 1.056, against the model's 0.96.
-- **Z margin at B90:** T14 4.07 mm. Passes at other tilts aren't measured by this check, and tilted poses lift the work origin well above the pivot.
+- **Z margin, every pass at its own tilt:** T14 3.63 mm on `Trace Stem Upper End`, 4.07 on `Trace Stem Lower` and 4.71 on the crown flutes. Everything else clears by 22 mm or more. Simulate's Z readings came out 5.8 mm above this check's on `Rough Scoop`, with X matching exactly, and that difference isn't explained, so treat this check as the cautious one.
 
-- **The holder clears the vise by 3.07 mm at the closest,** at C 45, 135, 225 and 315 on `Trace Stem Upper` and `Trace Stem Lower`. Other C angles clear by 18 mm or more. The holder never reaches the part's height, and the shank clears the part's envelope by 1.13 mm. The holder is estimated, so measure it and rerun this before cutting.
+- **The holder clears the vise by 3.13 mm at the closest,** at C 45, 135, 225 and 315 on `Trace Stem Lower`. Both upper stem stages clear by 21.5 mm or more. The holder never reaches the part's height, and the shank clears the part's envelope by 1.13 mm. The holder is estimated, so measure it and rerun this before cutting.
 
 These read the program, not the machine. **The lathe checks don't model the inserts' flank clearance or the holders, and none of this replaces Simulate with Machine.**
 

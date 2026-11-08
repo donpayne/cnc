@@ -32,14 +32,17 @@ T14_FEEDS = {
 
 # B 90 on the crown: the floor slopes 18.5 deg, so the ball already cuts off its tip. The stem's lower band also slopes
 # enough, and its end needs B 90, because the end is a radial cylinder. The upper band's floor is nearly parallel to
-# the axis, so B 95 moves the contact 5 to 10 deg off the ball's tip, where surface speed is at least 5 m/min rather than 0.
-# Leaning the other way, B 75 ran T14's neck 48 um into the top of the flute's radial run-out. Further this way, B 100 and
-# up drive the holder's flange into the jaws at the diagonal C angles.
+# the axis, so B 83 moves the contact about 7 deg off the ball's tip on most of it, where surface speed is about 8 m/min
+# rather than 0. Its end gets a B 90 pass of its own, because leaning up runs T14's neck into the turned stem above the
+# end: 12 um at B 83, 25 at B 80, 48 at B 75. Leaning down instead doesn't fit: past B 90 the finial, 200.6 mm from the B
+# pivot, swings below it, and at B 95 the spindle needs 11 mm more Z than the machine has.
 CROWN_B_DEG = 90.0
 STEM_LOWER_B_DEG = 90.0
-STEM_UPPER_B_DEG = 95.0
+STEM_UPPER_B_DEG = 83.0
+STEM_UPPER_END_B_DEG = 90.0
 
-# Pass prefix, floor curves, low cap, high cap, B.
+# Pass prefix, floor curves, low cap, high cap, B. A band with no cap at either end starts and stops inside its channel,
+# so an end pass has to clear its high end first.
 FLUTE_BANDS = {
     "Trace Crown Flute": (
         queen_flutes.CROWN_FLOOR,
@@ -47,17 +50,21 @@ FLUTE_BANDS = {
         (queen_flutes.CROWN_UPPER_END, queen_flutes.CROWN_UPPER_EXIT_R_MM),
         CROWN_B_DEG,
     ),
-    "Trace Stem Upper": (
-        queen_flutes.STEM_UPPER_FLOOR,
-        None,
-        (queen_flutes.STEM_UPPER_END, queen_flutes.STEM_UPPER_EXIT_R_MM),
-        STEM_UPPER_B_DEG,
-    ),
+    "Trace Stem Upper": (queen_flutes.STEM_UPPER_FLOOR, None, None, STEM_UPPER_B_DEG),
     "Trace Stem Lower": (
         queen_flutes.STEM_LOWER_FLOOR,
         (queen_flutes.STEM_LOWER_END, queen_flutes.STEM_LOWER_EXIT_R_MM),
         None,
         STEM_LOWER_B_DEG,
+    ),
+}
+
+# Pass prefix, floor curves, high cap, B. Each cuts only a band's high end.
+FLUTE_ENDS = {
+    "Trace Stem Upper End": (
+        queen_flutes.STEM_UPPER_FLOOR,
+        (queen_flutes.STEM_UPPER_END, queen_flutes.STEM_UPPER_EXIT_R_MM),
+        STEM_UPPER_END_B_DEG,
     ),
 }
 
@@ -142,13 +149,31 @@ def flute_paths(floor, low_cap, high_cap):
     return paths
 
 
+def flute_end_paths(floor, high_cap):
+    """Roughing steps in from the run-out, then finish cuts, with the same climb-cut directions as the band."""
+    paths = [list(reversed(queen_flutes.end_rough_path(floor, depth_mm, high_cap))) for depth_mm in queen_flutes.ROUGH_DEPTHS_ABOVE_FLOOR_MM]
+    for side_deg in queen_flutes.FINISH_SIDES_DEG:
+        path = queen_flutes.end_finish_path(floor, side_deg, high_cap)
+        paths.append(list(reversed(path)) if side_deg < 0 else path)
+    return paths
+
+
+def paths_and_tilt(prefix):
+    """The ball-center paths for this pass prefix, and its B."""
+    if prefix in FLUTE_ENDS:
+        floor, high_cap, b_deg = FLUTE_ENDS[prefix]
+        return flute_end_paths(floor, high_cap), b_deg
+    floor, low_cap, high_cap, b_deg = FLUTE_BANDS[prefix]
+    return flute_paths(floor, low_cap, high_cap), b_deg
+
+
 def add_flute_sketch(root, prefix, c_deg):
     """One sketch per flute, with one list of curves per cut."""
-    floor, low_cap, high_cap, b_deg = FLUTE_BANDS[prefix]
+    paths, b_deg = paths_and_tilt(prefix)
     sketch = root.sketches.add(root.xYConstructionPlane)
     sketch.name = f"{prefix} {c_deg:03d}"
     sketch.isComputeDeferred = True
-    chains = [add_path(sketch, [queen_flutes.tip_of(center, c_deg, b_deg) for center in path]) for path in flute_paths(floor, low_cap, high_cap)]
+    chains = [add_path(sketch, [queen_flutes.tip_of(center, c_deg, b_deg) for center in path]) for path in paths]
     sketch.isComputeDeferred = False
     return chains
 
@@ -192,7 +217,7 @@ def add_trace_pass(cam, setup, root, name, tool_number, chains, c_deg, b_deg, fe
 
 def add_flute_pass(cam, setup, root, prefix, c_deg):
     chains = add_flute_sketch(root, prefix, c_deg)
-    return add_trace_pass(cam, setup, root, f"{prefix} {c_deg:03d}", 14, chains, c_deg, FLUTE_BANDS[prefix][3], T14_FEEDS)
+    return add_trace_pass(cam, setup, root, f"{prefix} {c_deg:03d}", 14, chains, c_deg, paths_and_tilt(prefix)[1], T14_FEEDS)
 
 
 T10_FEEDS = {
@@ -350,7 +375,7 @@ PATTERN_STEP_EXPRESSION = "45 deg"
 # Far from the vise first. The tool order follows from that: T3, T4 and T10 on the crown, then T14 down the flutes.
 PATTERN_STAGES = (
     "Rough Scoop", "Finish Scoop", "Finish Rim", "Detail Inner", "Detail Crest",
-    "Trace Crown Flute", "Trace Stem Upper", "Trace Stem Lower",
+    "Trace Crown Flute", "Trace Stem Upper End", "Trace Stem Upper", "Trace Stem Lower",
 )
 
 

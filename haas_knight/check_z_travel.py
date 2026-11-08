@@ -1,12 +1,18 @@
 """Shows how close each tool and pass comes to the lower Z limit, and the shortest tool that still reaches.
 
-At B90 the part axis sits at the B pivot height, so:
-  machine Z = pivot Z + work Z + gauge-to-tip length - nose height above the table at Z0.
-This matched Simulate's readings. Tilted passes lift the work origin well above the pivot, so B90 sets
-the limit. Tool lengths come from knight_job.TOOLS.
+The work origin sits on the C axis, which passes through the B pivot, so at tilt B it is at
+  pivot Z + (origin height above the table - pivot Z) x cos B,
+and the post's Z words are measured from there along the tool:
+  machine Z = that + work Z + gauge-to-tip length - nose height above the table at Z0.
+At B90 the origin is at pivot height whatever its height, which matched Simulate's readings on the Knight. Below B90 it
+rises, but past B90 it drops below the pivot: on the Queen, B95 lowered it 17.5 mm and ran out of travel.
+
+Every pass is checked when the job file gives WORK_ORIGIN_ABOVE_TABLE_MM, Fusion's Part Position offset. Without it,
+only B90 passes are. Tool lengths come from knight_job.TOOLS.
 
 Usage: python3 -B check_z_travel.py <program.nc>
 """
+import math
 import os
 import re
 import sys
@@ -30,30 +36,44 @@ def lowest_work_z(one_pass):
     return min(z_values, default=None)
 
 
-def shortest_tool_mm(work_z):
-    return job.Z_LIMIT_MM - job.B_PIVOT_Z_MM + job.NOSE_HEIGHT_AT_Z0_MM - work_z
+def work_origin_z_mm(b_deg):
+    if b_deg == B90_DEG:
+        return job.B_PIVOT_Z_MM
+    pivot_to_origin_mm = job.WORK_ORIGIN_ABOVE_TABLE_MM - job.B_PIVOT_Z_MM
+    return job.B_PIVOT_Z_MM + pivot_to_origin_mm * math.cos(math.radians(b_deg))
+
+
+def shortest_tool_mm(work_z, b_deg):
+    return job.Z_LIMIT_MM - work_origin_z_mm(b_deg) + job.NOSE_HEIGHT_AT_Z0_MM - work_z
 
 
 def main():
     passes = replay.read_passes(sys.argv[1])
-    b90_rows = []
+    can_check_any_tilt = hasattr(job, "WORK_ORIGIN_ABOVE_TABLE_MM")
+    rows = []
+    unchecked = {}
     for one_pass in passes:
         work_z = lowest_work_z(one_pass)
-        if work_z is None or one_pass.b_deg != B90_DEG:
+        if work_z is None:
             continue
-        margin = job.TOOLS[one_pass.tool].gauge_to_tip_mm - shortest_tool_mm(work_z)
-        b90_rows.append((margin, one_pass.name, one_pass.tool, work_z))
+        if not can_check_any_tilt and one_pass.b_deg != B90_DEG:
+            unchecked[one_pass.name] = one_pass.b_deg
+            continue
+        margin = job.TOOLS[one_pass.tool].gauge_to_tip_mm - shortest_tool_mm(work_z, one_pass.b_deg)
+        rows.append((margin, one_pass.name, one_pass.tool, one_pass.b_deg, work_z))
 
-    print("tool | deepest B90 work Z | pass | shortest length | modeled | margin")
-    for tool_number in sorted({row[2] for row in b90_rows}):
-        margin, name, _, work_z = min(row for row in b90_rows if row[2] == tool_number)
-        print(f"T{tool_number} | {work_z} | {name} | {shortest_tool_mm(work_z):.2f} | {job.TOOLS[tool_number].gauge_to_tip_mm} | {margin:.2f}")
+    print("tool | B | deepest work Z | pass | shortest length | modeled | margin")
+    for tool_number in sorted({row[2] for row in rows}):
+        margin, name, _, b_deg, work_z = min(row for row in rows if row[2] == tool_number)
+        shortest_mm = shortest_tool_mm(work_z, b_deg)
+        print(f"T{tool_number} | {b_deg:g} | {work_z} | {name} | {shortest_mm:.2f} | {job.TOOLS[tool_number].gauge_to_tip_mm} | {margin:.2f}")
 
     print(f"\npasses under {TIGHT_MARGIN_MM:.0f} mm of margin:")
-    for margin, name, tool_number, work_z in sorted(row for row in b90_rows if row[0] < TIGHT_MARGIN_MM):
-        print(f"  {margin:6.2f} | {name} | T{tool_number} | work Z {work_z}")
+    for margin, name, tool_number, b_deg, work_z in sorted(row for row in rows if row[0] < TIGHT_MARGIN_MM):
+        print(f"  {margin:6.2f} | {name} | T{tool_number} | B{b_deg:g} | work Z {work_z}")
 
-    print(f"\nnot at B90, so not checked: { {one_pass.name: one_pass.b_deg for one_pass in passes if one_pass.b_deg != B90_DEG} }")
+    if unchecked:
+        print(f"\nnot at B90, and the job file has no WORK_ORIGIN_ABOVE_TABLE_MM, so not checked: {unchecked}")
 
 
 if __name__ == "__main__":

@@ -27,7 +27,7 @@ class Tool(NamedTuple):
 TOOLS = {
     1: Tool(6.35, 7600, 118.9, is_ball=False, neck_length_mm=19.05, shank_diameter_mm=6.35),
     3: Tool(4.7625, 8000, 118.9, is_ball=True, neck_length_mm=15.88, shank_diameter_mm=4.7625),
-    4: Tool(3.175, 10000, 113.9, is_ball=True, neck_length_mm=25.0, shank_diameter_mm=6.35),
+    4: Tool(3.175, 10000, 120.0, is_ball=True, neck_length_mm=25.0, shank_diameter_mm=6.35),
     10: Tool(1.5875, 10000, 114.3, is_ball=True, neck_length_mm=19.05, shank_diameter_mm=3.175),
     14: Tool(2.0, 10000, 108.9, is_ball=True, neck_length_mm=10.0, shank_diameter_mm=3.175),
 }
@@ -36,6 +36,8 @@ TOOLS = {
 Z_LIMIT_MM = -305.0
 B_PIVOT_Z_MM = -8.59
 NOSE_HEIGHT_AT_Z0_MM = 406.0
+# The mill setup's Part Position: G54, the finial's tip, this far above the table's attach frame.
+WORK_ORIGIN_ABOVE_TABLE_MM = 192.003
 
 # The post writes links as G1 F5000 in a metric program, and no cutting feed comes near this.
 LINK_FEED_MM_PER_MIN = 4000.0

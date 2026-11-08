@@ -151,6 +151,17 @@ def rough_path(curves, depth_above_floor_mm, low_cap=None, high_cap=None):
     return _without_repeats(path)
 
 
+def end_finish_path(curves, side_deg, high_cap):
+    """Only the high end: from the channel's last point, around the end sphere and out, for a pass at its own tilt."""
+    point, normal = floor_points(curves)[-1]
+    return _without_repeats([center_at(point, normal, side_deg)] + _end_cap(high_cap[0], normal, side_deg, 1.0, high_cap[1]))
+
+
+def end_rough_path(curves, depth_above_floor_mm, high_cap):
+    """Only the high end of a roughing cut: the channel's last point and the run-out."""
+    return rough_path(curves, depth_above_floor_mm, high_cap=high_cap)[-2:]
+
+
 def _without_repeats(path):
     kept = [path[0]]
     for point in path[1:]:
