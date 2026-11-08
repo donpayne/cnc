@@ -43,6 +43,15 @@ PASSES = (
 )
 HEIGHT_PREFIXES = ("frontHeight", "backHeight")
 
+# T7's placeholder holder is 20 mm wide and centred on its tip, so it reaches 10 mm below the tip. Near the axis, on the
+# finial's dome, that put it over the head's top (r 11.65 at z 79.1), and Simulate flagged it in Rough detail. T6's
+# right-hand holder sits above its tip and roughs the dome without trouble, so T6 finishes the dome and cone down to
+# the corner where they meet the r 4.937 cylinder. T7 starts there: at r 4.937 or more its holder clears the head by about
+# 3.6 mm, using the 10.6 mm from tip to holder front that Simulate's collision point implies.
+TIP_SEAM_Z_MM = 83.8496
+TIP_PASS_NAME = "Finish tip"
+T7_PASSES_BELOW_TIP = ("Rough detail", "Finish profile")
+
 
 def find_tool(cam, tool_number):
     for tool in cam.documentToolLibrary:
@@ -105,6 +114,54 @@ def add_passes_after_finish(cam, queen_cam, names):
     for name, source_name, front_z_mm, back_z_mm in PASSES:
         if name in names:
             add_pass(cam, sources[source_name], name, front_z_mm, back_z_mm, before=next_pass)
+
+
+FINISH_FEED_SETTINGS = ("tool_feedCuttingRel", "tool_feedEntryRel", "tool_feedExitRel", "tool_surfaceSpeed")
+
+
+def _add_tip_pass(setup, finish, rough):
+    """A copy of Finish profile on rough's T6, with Finish profile's finishing feeds but none of T7's other tool settings.
+
+    Taking the tool from the document's library gave a second T6 entry whose holder differed (end cutting), and the
+    post refused it: "Different tools have the same tool number". So the pass reuses Rough profile's T6.
+    """
+    operation_input = setup.operations.createInput(finish.strategy)
+    operation_input.tool = rough.tool
+    operation = setup.operations.add(operation_input)
+    operation.name = TIP_PASS_NAME
+    operation.tool = rough.tool
+    refused = []
+    for index in range(finish.parameters.count):
+        source = finish.parameters.item(index)
+        target = operation.parameters.itemByName(source.name)
+        is_tool_setting = source.name.startswith("tool_") and source.name not in FINISH_FEED_SETTINGS
+        if target is None or is_tool_setting or source.name.startswith(HEIGHT_PREFIXES) or target.expression == source.expression:
+            continue
+        try:
+            target.expression = source.expression
+        except RuntimeError:
+            refused.append(source.name)
+    return operation, refused
+
+
+def finish_tip_with_t6(cam):
+    """Has T6 finish the finial's dome and cone, right after its own roughing, and keeps T7 below them."""
+    setup = cam.setups.itemByName(SETUP_NAME)
+    by_name = {operation.name: operation for operation in setup.allOperations}
+    tip = by_name.get(TIP_PASS_NAME)
+    if tip is None:
+        tip, refused = _add_tip_pass(setup, by_name["Finish profile"], by_name["Rough profile"])
+        print(TIP_PASS_NAME, "refused", refused)
+        tip.moveAfter(by_name["Rough profile"])
+    params = tip.parameters
+    params.itemByName("frontHeight_mode").expression = "'model front'"
+    set_z_limit(params, "backHeight", TIP_SEAM_Z_MM)
+    # A lead-out from the corner would run down and out, into the cylinder below. With none, T6 leaves straight out in X.
+    params.itemByName("exit_sameAsEntry").expression = "false"
+    params.itemByName("exit_distance").expression = "0 mm"
+    for name in T7_PASSES_BELOW_TIP:
+        set_z_limit(by_name[name].parameters, "frontHeight", TIP_SEAM_Z_MM)
+    return [operation.name for operation in setup.allOperations]
 
 
 def add_or_update_program(cam, source_cam, program_name, setup_names, output_folder):

@@ -22,12 +22,13 @@ Scaled from `Solid Of the King` in the `Chess Set` document: 86.23 mm tall at 73
 
 ## Lathe
 
-Program 1005, about 15.6 min. The blank is 1-1/2 in bar, 125 mm long, with a 30 mm grip. Jaws must be bored for 38.1 mm on both machines. Cutting stops at the neck bottom, z -5. The passes are the Queen's, with the King's Z limits.
+Program 1005, about 15.2 min. The blank is 1-1/2 in bar, 125 mm long, with a 30 mm grip. Jaws must be bored for 38.1 mm on both machines. Cutting stops at the neck bottom, z -5. The passes are the Queen's, with the King's Z limits.
 
 | Pass | Tool | Min |
 |---|---|---|
 | `Face top` | T6 | 0.09 |
 | `Rough profile` | T6 | 3.08 |
+| `Finish tip` | T6 | 0.02 |
 | `Rough detail` | T7 | 9.98 |
 | `Finish profile` | T7 | 0.57 |
 | `Rough under head` | T8 | 0.08 |
@@ -37,6 +38,8 @@ Program 1005, about 15.6 min. The blank is 1-1/2 in bar, 125 mm long, with a 30 
 | `Groove neck` | T8 | 0.28 |
 
 T6, T7 and T8 are the placeholder inserts from the Knight: CNMG r 0.8, VNMG 35 deg r 0.4, and a 3 mm groove r 0.2. Part-off and the base's underside have no pass yet.
+
+**T6 finishes the finial's tip, not T7.** T7's neutral holder is 20 mm wide, centred on its tip, so it reaches 10 mm below the tip. Near the axis it sat over the head's top, r 11.65, and Simulate flagged a collision in `Rough detail`. `Finish tip` has T6, whose right-hand holder sits above its tip, finish the dome and cone right after its roughing, down to their corner with the r 4.937 cylinder at z 83.85. Both T7 passes start there. Measured square to the surface, `Finish tip` cuts in by at most 0.0002 mm and leaves at most 0.004 mm. `check_lathe.py`'s -0.143 at z 86.20 to 86.22 is its radial measure on the nearly flat top of the dome. `finish_tip_with_t6()` in `king_lathe_cam.py` made the change. You reported Simulate good on this lathe program and the T4 mill program (version 24).
 
 **T8 plunges under the finial's head** to a staircase over a floor at z 79.1, so the mill's cup roughing has less to take. `Groove under collar` cuts the collar's steep underside, z 55.6 to 51.0.
 
@@ -53,12 +56,12 @@ Stock left by the replay, against the target:
 | z 60.68 to 61.06 | 0.078 mm | Small steps in the collar's profile |
 | z 78.88 to 79.18 | 0.187 mm | The staircase's floor under the head, which the mill's cup passes take |
 | z 82.02 to 82.84 | 0.139 mm | The staircase's steps under the head, same |
-| z 86.12 to 86.22 | 0.437 mm | A small nib at the finial's tip |
 
 Four other bands read 0.039 to 0.096 mm, all small steps under 0.2 mm long.
 
 **Readings the other way:**
 - **z 82.10, -0.150 mm: probably not real.** It's a single row at the staircase's step, where `check_lathe.py`'s one radius per z row can't represent a vertical face. It hasn't been proven.
+- **z 86.20 to 86.22, -0.143 mm: not real.** It's the radial measure on the nearly flat top of the dome. Measured square to the surface, T6's `Finish tip` is within 0.0002 mm. The 0.437 mm nib T7 used to leave there is gone.
 - **Everything else, 0.031 mm or less.** The largest is at z 24.02 to 24.30. On the crown's seams the target is 0.1 out, so -0.011 there still turns 0.089 proud of the model's corner.
 
 ## Mill
@@ -103,7 +106,7 @@ Mill tools. Lengths in mm. Total is gauge line to tip.
 | T11 | 2 mm flat, 3.175 shank from 6 up | 102.9 | 10,000 | 200 |
 | T14 | 2 mm ball, relieved neck to 10, 3.175 shank | 108.9 | 10,000 | 150 |
 
-**T4 must stick out about 120 mm,** longer than on the Queen, or `Octagon Strips` runs out of Z travel at B90. All lengths should be measured, because the Z and holder margins below depend on them.
+**T4 must be 120 mm gauge to tip, 31.1 out of the holder,** or `Octagon Strips` runs out of Z travel at B90. That's the length for every piece in the set. In Fusion, set the tool's stored assembly gauge length as well as its body length, because the gauge doesn't follow the body length. By version 18 the document had gone back to 113.9. Version 21 restores 120, and regenerating changed only `Rough Cup`. All lengths should be measured, because the Z and holder margins below depend on them.
 
 ## What the checks found
 
