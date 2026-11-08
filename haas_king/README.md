@@ -22,16 +22,16 @@ Scaled from `Solid Of the King` in the `Chess Set` document: 86.23 mm tall at 73
 
 ## Lathe
 
-Program 1005, about 15.2 min. The blank is 1-1/2 in bar, 125 mm long, with a 30 mm grip. Jaws must be bored for 38.1 mm on both machines. Cutting stops at the neck bottom, z -5. The passes are the Queen's, with the King's Z limits.
+Program 1005, about 17.2 min. The blank is 1-1/2 in bar, 125 mm long, with a 30 mm grip. Jaws must be bored for 38.1 mm on both machines. Cutting stops at the neck bottom, z -5. The passes are the Queen's, with the King's Z limits.
 
 | Pass | Tool | Min |
 |---|---|---|
 | `Face top` | T6 | 0.09 |
 | `Rough profile` | T6 | 3.08 |
 | `Finish tip` | T6 | 0.02 |
-| `Rough detail` | T7 | 9.98 |
+| `Rough detail` | T7 | 9.60 |
 | `Finish profile` | T7 | 0.57 |
-| `Rough under head` | T8 | 0.08 |
+| `Rough under head` | T8 | 1.60 |
 | `Groove under head` | T8 | 0.21 |
 | `Groove under collar` | T8 | 0.13 |
 | `Rough neck groove` | T8 | 1.14 |
@@ -41,7 +41,7 @@ T6, T7 and T8 are the placeholder inserts from the Knight: CNMG r 0.8, VNMG 35 d
 
 **T6 finishes the finial's tip, not T7.** T7's neutral holder is 20 mm wide, centred on its tip, so it reaches 10 mm below the tip. Near the axis it sat over the head's top, r 11.65, and Simulate flagged a collision in `Rough detail`. `Finish tip` has T6, whose right-hand holder sits above its tip, finish the dome and cone right after its roughing, down to their corner with the r 4.937 cylinder at z 83.85. Both T7 passes start there. Measured square to the surface, `Finish tip` cuts in by at most 0.0002 mm and leaves at most 0.004 mm. `check_lathe.py`'s -0.143 at z 86.20 to 86.22 is its radial measure on the nearly flat top of the dome. `finish_tip_with_t6()` in `king_lathe_cam.py` made the change. You reported Simulate good on this lathe program and the T4 mill program (version 24).
 
-**T8 plunges under the finial's head** to a staircase over a floor at z 79.1, so the mill's cup roughing has less to take. `Groove under collar` cuts the collar's steep underside, z 55.6 to 51.0.
+**T8 plunges under the finial's head** to a staircase over a floor at z 79.1, so the mill's cup roughing has less to take. Its plunges feed at 0.05 mm/rev, like the other T8 passes. Until version 26 they were set to 1.0 mm/rev, which would have broken the insert, and neither Simulate nor `check_lathe.py` checks feeds. Only the feed words changed when it was fixed. `Groove under collar` cuts the collar's steep underside, z 55.6 to 51.0.
 
 **The target is the mill's stock, not the model.** It's the `Lathe Target` body, revolved from the sketch `Lathe Target Profile`, which is drawn in the plane at C 22.5, through the corners:
 - **It stands 0.1 mm outside the 8-fold corners**, on the octagon (z 27.65 to 45.41) and on the crown's seams (z 63.18 to 65.05). Turned exactly to the corners, the lathe's small undercuts left a turned strip along every seam. With the extra stock the two mill passes on either side meet in a sharp seam.
