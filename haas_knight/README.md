@@ -62,10 +62,10 @@ These checks read the program, not the machine. They don't replace Simulate with
 | `gcode_replay.py` | Reads posted programs and the model's faces, for the checks. |
 | `export_faces.py` | Fusion script that writes `knight_faces.json`. |
 | `knight_faces.json` | The Knight's 66 faces as meshes. |
-| `nc/knight_mill.nc` | The milling program posted from version 9 of the document, 45 passes. |
+| `nc/knight_mill.nc` | The milling program posted from version 11 of the document, 45 passes. |
 | `nc/knight_lathe.nc` | The lathe program, program 1001, posted in G21 from version 10 of the document. |
 | `knight_lathe_cam.py` | Fusion script that sets the lathe passes and posts them. |
 | `knight_lathe_profile.json` | The `Lathe Target` body's section as (r, z) polylines, for `check_lathe.py`. |
 | `check_lathe.py` | Replay check for the metric lathe program, using the Pawn's. |
 
-The holder lengths in `knight_job.py` are estimates. Update them when the real tools are measured, because `check_z_travel.py` is only as good as those numbers.
+The holder lengths in `knight_job.py` are estimates. Update them when the real tools are measured, because `check_z_travel.py` is only as good as those numbers. T4 is 120 mm gauge to tip, 31.1 out of the holder, as on every piece in the set. That gives 6.81 mm of Z margin instead of 0.71, and posted the T4 passes unchanged.
