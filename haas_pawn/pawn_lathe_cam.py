@@ -8,9 +8,10 @@ import adsk.cam
 import adsk.core
 
 TOP_Z_MM = 46.0172
-# The Bishop's T6 roughing ran about 6 mm past its head's bottom. Here that would thin the 8 mm neck under the ball before
-# the head is finished, so T6 stops 2 mm below the neck, at the waist's top.
-STEM_ROUGH_LIMIT_Z_MM = 26.0
+# T6 roughs the head well down the waist. T7's neutral holder is 20 mm wide, centered on its tip, so while T7 works under
+# the lower bead (z 28) the holder reaches about 10 mm lower. Stopped at z 26, T6 left the raw bar there, and Simulate
+# showed the holder running into it.
+STEM_ROUGH_LIMIT_Z_MM = 15.0
 HEAD_BOTTOM_Z_MM = 28.0842  # Top of the 8 mm neck, under the lower bead's fillet.
 BASE_UNDERSIDE_Z_MM = 0.8955  # Top of the foot's fillet, where T8 takes over.
 NECK_BOTTOM_Z_MM = -5.0

@@ -2,7 +2,7 @@
 
 The posted program and its check for a 73% chess Pawn in 1215 steel. It uses the same scale, bar and lathe inserts as the [Bishop](../haas_bishop/README.md). The Pawn is round all over, so it's the first piece in the set with nothing for the UMC-350HD-EDU to cut. There's no mill setup or mill program.
 
-**Status: nothing here has cut metal.** Feeds and speeds are untested estimates, and the inserts are the Knight's placeholders. Simulate hasn't been run on this program. The toolpaths are in the Fusion document `Chess Pawn 73pct Haas UMC-350HD-EDU`, in the project `Chess Pawn - Haas UMC-350HD-EDU`. That document is a copy of the Bishop's with the Bishop's model, slit and mill setup removed. `nc/` holds a copy of what was posted from it.
+**Status: nothing here has cut metal.** Feeds and speeds are untested estimates, and the inserts are the Knight's placeholders. The user ran Simulate in Fusion on the posted program (version 7) and it showed no collisions. Simulate with Machine hasn't been run. The toolpaths are in the Fusion document `Chess Pawn 73pct Haas UMC-350HD-EDU`, in the project `Chess Pawn - Haas UMC-350HD-EDU`. That document is a copy of the Bishop's with the Bishop's model, slit and mill setup removed. `nc/` holds a copy of what was posted from it.
 
 ## The part
 
@@ -28,10 +28,10 @@ The program turns to the `Pawn Lathe Target` body: the Pawn joined with that nec
 | Pass | Tool | From z | To z | Min |
 |---|---|---|---|---|
 | `Face top` | T6 | top | | 0.07 |
-| `Rough head` | T6 | top | 26.0 | 0.73 |
+| `Rough head` | T6 | top | 15.0 | 1.05 |
 | `Rough head detail` | T7 | top | 28.08 | 2.00 |
 | `Finish head` | T7 | top | 28.08 | 0.08 |
-| `Rough body` | T6 | 26.0 | -5 | 0.76 |
+| `Rough body` | T6 | 15.0 | -5 | 0.44 |
 | `Rough waist` | T7 | 28.08 | 0.90 | 2.32 |
 | `Rough neck groove` | T8 | 0.90 | -5 | 0.89 |
 | `Groove under collar` | T8 | 32.25 | 28.5 | 0.06 |
@@ -42,7 +42,7 @@ The program turns to the `Pawn Lathe Target` body: the Pawn joined with that nec
 T6, T7 and T8 are the placeholder inserts from the Knight: a CNMG r 0.8, a VNMG 35 deg r 0.4, and a 3 mm groove insert r 0.2. Part-off and the foot's underside have no pass yet, as on every piece in the set.
 
 `pawn_lathe_cam.py` sets the passes. These choices differ from the Bishop's:
-- **The head is finished before the waist is cut.** T6 roughs only 2 mm past the neck, so the 8 mm neck under the ball keeps its stock until the head is done.
+- **The head is finished before the waist is finished.** T6 roughs the head and the top of the waist down to z 15, leaving 0.25 mm. It can't stop sooner: T7's neutral holder is 20 mm wide and centered on its tip, so while T7 works under the lower bead (z 28) the holder reaches about 10 mm lower. With T6 stopped at z 26, Simulate showed 5 collisions, with that holder running into the raw bar.
 - **T8 cuts both undersides.** The collar's underside is 13.5 deg from radial and the lower bead's is 17 deg, both too steep for T7's V. Each groove's back limit sets where T8's lower corner stops, 3 mm below the upper one. Under the collar the lower corner runs beside the lower bead, clearing its rim (r 5.35) by staying at r 5.35 or more.
 - **The spun profile is fitted at 0.002 mm, not Fusion's 0.01.** At 0.01 with smoothing, Fusion merged the neck and the top of the waist into one arc that ran 0.015 mm inside the neck. Tightening only the finishing passes' tolerance didn't change it. The finishing passes are at 0.002 mm too.
 - **`Groove neck` has no lead-out.** Its 2 mm lead-out at 45 deg ran into the bar's shoulder at z -5, and Fusion warned that it had bent it. Now the insert leaves straight out in X, and no pass has a warning.
