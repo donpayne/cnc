@@ -8,6 +8,8 @@ The [Haas Bishop](haas_bishop/README.md) follows, with its own slit and metric l
 
 The [Haas Queen](haas_queen/README.md) is next, on larger bar, with its flutes and scoops cut from computed paths.
 
+The [Haas King](haas_king/README.md) follows on the same bar, with its cup cut by turning C at a fixed tilt.
+
 ## Setup
 
 The [Pocket NC Knight](pocketnc_knight/README.md) has a Fusion script and Python checks. To install them, get [Python](https://www.python.org/downloads/) 3.9 or newer, open Fusion once if you plan to use it, then run this from the repo's folder.
