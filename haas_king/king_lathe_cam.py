@@ -169,6 +169,9 @@ def add_or_update_program(cam, source_cam, program_name, setup_names, output_fol
     the same role (lathe or mill), and posts it."""
     role = "lathe" if program_name.endswith("lathe") else "mill"
     source = next(program for program in source_cam.ncPrograms if program.name.endswith(role))
+    for name in setup_names:
+        # 0 also posts G54, but the post warns about it on every run.
+        cam.setups.itemByName(name).parameters.itemByName("job_workOffset").expression = "1"
     program = next((p for p in cam.ncPrograms if p.name == program_name), None)
     if program is None:
         program_input = cam.ncPrograms.createInput()
