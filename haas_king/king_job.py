@@ -31,7 +31,7 @@ TOOLS = {
     # 6.1 longer than the Queen's, so Octagon Strips at B90 stays inside the Z limit (needs 115.0).
     4: Tool(3.175, 10000, 120.0, is_ball=True, neck_length_mm=25.0, shank_diameter_mm=6.35),
     10: Tool(1.5875, 10000, 114.3, is_ball=True, neck_length_mm=19.05, shank_diameter_mm=3.175),
-    11: Tool(2.0, 10000, 102.9, is_ball=False, neck_length_mm=6.0, shank_diameter_mm=3.175),
+    11: Tool(2.0, 10000, 102.9, is_ball=False, neck_length_mm=6.0, shank_diameter_mm=3.0),
     14: Tool(2.0, 10000, 108.9, is_ball=True, neck_length_mm=10.0, shank_diameter_mm=3.175),
 }
 

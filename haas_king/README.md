@@ -103,7 +103,7 @@ Mill tools. Lengths in mm. Total is gauge line to tip.
 | T2 | 1/4 in flat, 25.4 flute | 133.6 | 7,600 | 762 |
 | T4 | 1/8 in ball, 6.35 shank from 25 up | 120.0 | 10,000 | 305 |
 | T10 | 1/16 in ball, relieved neck to 19.05 | 114.3 | 10,000 | 120 |
-| T11 | 2 mm flat, 3.175 shank from 6 up | 102.9 | 10,000 | 200 |
+| T11 | 2 mm flat, 3.0 shank from 6 up | 102.9 | 10,000 | 200 |
 | T14 | 2 mm ball, relieved neck to 10, 3.175 shank | 108.9 | 10,000 | 150 |
 
 **T4 must be 120 mm gauge to tip, 31.1 out of the holder,** or `Octagon Strips` runs out of Z travel at B90. That's the length for every piece in the set. In Fusion, set the tool's stored assembly gauge length as well as its body length, because the gauge doesn't follow the body length. By version 18 the document had gone back to 113.9. Version 21 restores 120, and regenerating changed only `Rough Cup`. All lengths should be measured, because the Z and holder margins below depend on them.
